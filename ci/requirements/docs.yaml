@@ -1,0 +1,8 @@
+name: asar-seastate-processor-docs
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - sphinx>=4
+  - sphinx_rtd_theme
+  - ipython
