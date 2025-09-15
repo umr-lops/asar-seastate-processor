@@ -58,7 +58,7 @@ def main():
     
     output_path = get_output_path(args.save_directory, args.input_path, args.product_id)
     
-    if os.path.exists(output_path) and not overwrite:
+    if os.path.exists(output_path) and not args.overwrite:
         logging.info(
             f"{output_path} already exists. Use --overwrite to overwrite."
         )
