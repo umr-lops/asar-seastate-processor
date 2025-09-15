@@ -1,0 +1,56 @@
+model_name: multi-model
+
+inputs:
+  - sigma0_filt
+  - normalized_variance_filt
+  - incidence
+  - azimuth_cutoff
+  - cwave_params
+  - macs_Re
+  - macs_Im
+
+outputs:
+  - swh
+  - windwave_swh
+  - Tm0
+  - swh_confidence
+  - windwave_swh_confidence
+  - Tm0_confidence
+
+kept_variables: []
+
+preprocessing:
+  function: "xr.Dataset.drop_sel"
+  parameters:
+    lambda_range_max_macs: 25
+    
+attributes:
+  swh:
+    units: m
+    standard_name: sea_surface_wave_significant_height
+    long_name: predicted significant wave height
+  
+  windwave_swh:
+    units: m
+    standard_name: wind_sea_surface_wave_significant_height
+    long_name: predicted significant wave height windsea
+  
+  Tm0:
+    units: sec
+    standard_name: sea_surface_wave_mean_period
+    long_name: predicted mean wave period
+  
+  swh_confidence:
+    units: m
+    standard_name: sea_surface_wave_significant_height_confidence
+    long_name: confidence associated with predicted significant wave height
+  
+  windwave_swh_confidence:
+    units: m
+    standard_name: wind_sea_surface_wave_significant_height_confidence
+    long_name: confidence associated with predicted significant wave height windsea
+  
+  Tm0_confidence:
+    units: sec
+    standard_name: sea_surface_wave_mean_period
+    long_name: predicted mean wave period

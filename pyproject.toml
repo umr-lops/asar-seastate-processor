@@ -1,57 +1,49 @@
 [project]
 name = "asar-seastate-processor"
 requires-python = ">= 3.11"
-license = { text = "MIT" }
-dependencies = []
+description = "Python library to generate Level-2 WAVE Product starting from Ifremer Level-1B or Level-1C ENVISAT ASAR files"
+readme.file = "README.md"
+readme.content-type = "text/markdown"
+license = {text = "MIT"}
+keywords = ["SAR", "wave", "research", "sea-state"]
+authors = [
+  {name = "Robin Marquart"},
+  {name = "Antoine Grouazel"},
+  {name = "Quentin Febvre"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+
+dependencies = [
+    "xarray",
+    "h5netcdf",
+    "netCDF4",
+    "pyyaml",
+    "onnxruntime"
+]
+
 dynamic = ["version"]
 
 [build-system]
-requires = ["setuptools>=64.0", "setuptools-scm"]
+requires = ["setuptools>=64.0", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["asar_seastate_processor"]
 
+[tool.setuptools.package-data]
+"*" = ["config/*.yaml", "models/*.onnx"]
+
 [tool.setuptools_scm]
-fallback_version = "9999"
+fallback_version = "999"
 
-[tool.ruff]
-builtins = ["ellipsis"]
-exclude = [
-  ".git",
-  ".eggs",
-  "build",
-  "dist",
-  "__pycache__",
-  "docs",
-]
-target-version = "py311"
+[tool.isort]
+profile = "black" 
+skip_gitignore = true
+float_to_top = true
+default_section = "THIRDPARTY"
+known_first_party = "asar-seastate-processor"
 
-extend-include = ["*.ipynb"]
-line-length = 100
-
-[tool.ruff.lint]
-select = [
-  "F",   # Pyflakes
-  "E",   # Pycodestyle
-  "I",   # isort
-  "UP",  # Pyupgrade
-  "TID", # tidy imports
-]
-ignore = [
-  "E402", # E402: module level import not at top of file
-  "E501", # E501: line too long - let black worry about that
-  "E731", # E731: do not assign a lambda expression, use a def
-]
-fixable = ["I"]
-extend-safe-fixes = [
-  "TID252", # absolute imports
-]
-
-
-[tool.ruff.lint.isort]
-known-first-party = ["asar_seastate_processor"]
-known-third-party = []
-
-[tool.ruff.lint.flake8-tidy-imports]
-ban-relative-imports = "all"
+[project.scripts]
+ASAR-L2-wave-processor = "asar_seastate_processor.main:main"
