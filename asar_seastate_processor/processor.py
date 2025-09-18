@@ -9,15 +9,15 @@ def generate_l2_wave_product(
     """
     Generate a level-2 wave (L2 WAV) product from an input L1B/C dataset.
     
-    Parameters:
-    - ds (xarray.Dataset): Input L1B/C dataset.
-    - model (onnxruntime.InferenceSession): ML model used for prediction.
-    - model_inputs (list of str): List of variables inputted to the model.
-    - model_outputs (list of str): List of variables predicted by the model.
-    - kept_variables (list of str): List of variables from the input dataset that are kept in the final product. Defaults to an empty list.
+    Args:
+        ds (xarray.Dataset): Input L1B/C dataset.
+        model (onnxruntime.InferenceSession): ML model used for prediction.
+        model_inputs (list of str): List of variables inputted to the model.
+        model_outputs (list of str): List of variables predicted by the model.
+        kept_variables (list of str): List of variables from the input dataset that are kept in the final product. Defaults to an empty list.
 
     Returns:
-    - l2_product (xarray.Dataset): Level-2 wave product.
+        l2_product (xarray.Dataset): Level-2 wave product.
     """
     # Pass dataset to another function if product acquisitions are on land only
     if ds.land_flag.all():
@@ -50,7 +50,6 @@ def generate_l2_wave_product(
 
     # Finish formatting l2 product
     l2_product = xr.merge([ds[kept_variables], predictions])
-    l2_product = l2_product.reset_coords(["line", "sample"], drop=True)
 
     return l2_product
 
@@ -61,12 +60,12 @@ def predict_variables(
     """
     Launch predictions using a neural model.
 
-    Parameters:
-    - model (onnxruntime.InferenceSession): ML model used for prediction.
-    - input_arrays (array like): Arrays containing the input data for ML predictions.
+    Args:
+        model (onnxruntime.InferenceSession): ML model used for prediction.
+        input_arrays (array like): Arrays containing the input data for ML predictions.
 
     Returns:
-    - res (tuple): Tuple containing predictions for each variable.
+        res (tuple): Tuple containing predictions for each variable.
     """
     # Reshape input arrays to allow concatenation
     reshaped_vars = [
@@ -93,14 +92,14 @@ def generate_product_on_land(
     """
     Generate a level-2 product when the input dataset contains only data acquired on land.
 
-    Parameters:
-    - ds_land (xarray.Dataset): Input L1B/C dataset.
-    - l2_ref (xarray.Dataset): Reference level-2 dataset.
-    - model_outputs (list of str): List of variables predicted by the model.
-    - kept_variables (list of str): List of variables from the input dataset that are kept in the final product.
+    Args:
+        ds_land (xarray.Dataset): Input L1B/C dataset.
+        l2_ref (xarray.Dataset): Reference level-2 dataset.
+        model_outputs (list of str): List of variables predicted by the model.
+        kept_variables (list of str): List of variables from the input dataset that are kept in the final product.
 
     Returns:
-    - xarray.Dataset: Level-2 wave product.
+        xarray.Dataset: Level-2 wave product.
     """
     
     l2_land = xr.Dataset()
@@ -139,13 +138,13 @@ def generate_reference_l2(
     Generate and save an l2-like dataset to serve as the default structure for land-only products
     It is important to be consistent with the version that will be used for the processing.
     
-    Parameters:
-    - input_path (str): path to the input level 1b file.
-    - output_path (str): path to save the resulting dataset.
-    - model (onnxruntime.InferenceSession): ML model used for prediction.
-    - model_inputs (list of str): List of variables inputted to the model.
-    - model_outputs (list of str): List of variables predicted by the model.
-    - kept_variables (list of str): List of variables from the input dataset that are kept in the final product.
+    Args:
+        input_path (str): path to the input level 1b file.
+        output_path (str): path to save the resulting dataset.
+        model (onnxruntime.InferenceSession): ML model used for prediction.
+        model_inputs (list of str): List of variables inputted to the model.
+        model_outputs (list of str): List of variables predicted by the model.
+        kept_variables (list of str): List of variables from the input dataset that are kept in the final product.
     """
     # Load l1b dataset
     l1b = xr.open_dataset(input_path).sel(pol='VV')

@@ -7,7 +7,7 @@ import sys
 import os
 
 from asar_seastate_processor.processor import generate_l2_wave_product
-from asar_seastate_processor.utils import load_config, get_output_path, format_l2
+from asar_seastate_processor.utils import load_config, get_output_path, format_l2, apply_preprocessing, apply_range_filters, add_quality_indices, save_l2 
 
 
 def setup_logging(verbose=False):
@@ -34,20 +34,7 @@ def parse_args():
    
     args = parser.parse_args()
     return args
-
-
-def apply_preprocessing(ds, preprocessing_config):
-    """Apply preprocessing to dataset if configuration is provided."""
-    if not preprocessing_config:
-        return ds
-
-    from functools import partial
-    preprocess = partial(
-        FUNCTION_MAP[preprocessing_config['function']], 
-        **preprocessing_config['parameters']
-    )
-    return preprocess(ds)
-    
+        
 
 def main():
     """
@@ -73,27 +60,26 @@ def main():
     model = onnxruntime.InferenceSession(model_path)
     
     logging.info("Processing file...")
-    asa_l1b = xr.open_dataset(args.input_path)
+    asa_l1b = xr.open_dataset(args.input_path).sel(pol='VV')
     asa_l1b = apply_preprocessing(asa_l1b, config.get('preprocessing'))
-
     asa_l2 = generate_l2_wave_product(
-        asa_l1b.sel(pol='VV'),
-        model, config['inputs'],
+        asa_l1b,
+        model,
+        config['inputs'],
         config['outputs'],
         config['kept_variables']
     )
-    asa_l2 = format_l2(asa_l2, config['attributes'])
+    asa_l2 = apply_range_filters(asa_l1b, asa_l2, config.get('range_filters'))
+    asa_l2 = format_l2(asa_l2, os.path.basename(args.input_path), config['attributes'])
+    asa_l2 = add_quality_indices(asa_l2, config.get('quality_variables'))
+    asa_l2 = asa_l2.reset_coords(["line", "sample"], drop=True)
+
     logging.info("Processing completed successfully.")
     
     logging.info("Saving L2 file...")
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    asa_l2.to_netcdf(output_path, engine="h5netcdf")
+    save_l2(asa_l2, output_path)
     logging.info("L2 file saved.")
 
-
-FUNCTION_MAP = {
-    'xr.Dataset.drop_sel': xr.Dataset.drop_sel,
-}
 
 if __name__ == "__main__":
     main()

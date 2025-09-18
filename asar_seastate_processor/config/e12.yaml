@@ -17,40 +17,87 @@ outputs:
   - windwave_swh_confidence
   - Tm0_confidence
 
+quality_variables:
+  drop_confidence: True
+  swh_quality:
+      input: swh_confidence
+      thresholds: [-0.75, -0.5]
+      attributes:
+        flag_values: 0b, 1b, 2b, 3b
+        flag_meanings: undefined bad acceptable good
+        coverage_content_type: qualityInformation
+        band: C
+        coordinates: lat lon
+        standard_name: sea_surface_wave_significant_height status_flag
+  windwave_swh_quality:
+      input: windwave_swh_confidence
+      thresholds: [-0.75, -0.5]
+      attributes:
+        flag_values: 0b, 1b, 2b, 3b
+        flag_meanings: undefined bad acceptable good
+        coverage_content_type: qualityInformation
+        band: C
+        coordinates: lat lon
+        standard_name: wind_sea_surface_wave_significant_height status_flag
+  Tm0_quality:
+      input: Tm0_confidence
+      thresholds: [-0.75, -0.5]
+      attributes:
+        flag_values: 0b, 1b, 2b, 3b
+        flag_meanings: undefined bad acceptable good
+        coverage_content_type: qualityInformation
+        band: C
+        coordinates: lat lon
+        standard_name: sea_surface_wave_mean_period status_flag
+
 kept_variables: []
 
 preprocessing:
   function: "xr.Dataset.drop_sel"
   parameters:
     lambda_range_max_macs: 25
+
+range_filters:
+    sigma0_filt: # 10^(-1.5)
+        min: 0.031622776601683794
+        max: 1.25
+    normalized_variance_filt:
+        min: 1
+        max: 1.75
+    azimuth_cutoff:
+        min: 50
+        max: 600
+    incidence:
+        min: 22.5
+        max: 23.5
     
 attributes:
   swh:
     units: m
     standard_name: sea_surface_wave_significant_height
-    long_name: predicted significant wave height
+    long_name: significant wave height
   
   windwave_swh:
     units: m
     standard_name: wind_sea_surface_wave_significant_height
-    long_name: predicted significant wave height windsea
+    long_name: significant wave height windsea
   
   Tm0:
     units: sec
     standard_name: sea_surface_wave_mean_period
-    long_name: predicted mean wave period
+    long_name: mean wave period
   
   swh_confidence:
     units: m
     standard_name: sea_surface_wave_significant_height_confidence
-    long_name: confidence associated with predicted significant wave height
+    long_name: confidence associated with significant wave height
   
   windwave_swh_confidence:
     units: m
     standard_name: wind_sea_surface_wave_significant_height_confidence
-    long_name: confidence associated with predicted significant wave height windsea
+    long_name: confidence associated with significant wave height windsea
   
   Tm0_confidence:
     units: sec
     standard_name: sea_surface_wave_mean_period
-    long_name: predicted mean wave period
+    long_name: mean wave period
