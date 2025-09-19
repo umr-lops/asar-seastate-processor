@@ -20,7 +20,7 @@ def load_config(config_path):
         return yaml.safe_load(f)
 
 
-def get_output_path(output_directory, path, product_id, date_directories=True):
+def get_output_path(output_directory, path, file_version, date_directories=True):
     """
     Generates the output path for the processed file.
 
@@ -33,10 +33,11 @@ def get_output_path(output_directory, path, product_id, date_directories=True):
     Returns:
         str: Full savepath.
     """
-    filename = path.split(os.sep)[-1]
-    filename = "".join([filename[:-6], f"{product_id.upper()}.nc"]) 
-    filename = filename.replace("_WVI_XSP", "_WVI_WAV")
-
+    filename = os.path.basename(path)
+    # filename = "".join([filename[:-6], f"{product_id.upper()}.nc"]) # Ifremer local version
+    # filename = filename.replace("_WVI_XSP", "_WVI_WAV") # Ifremer local version
+    filename_cci = "ESACCI-SEASTATE-L2P-ISSP-ENVISAT_ASAR_WV_IFR-%s-fv01.nc" % filename[18:33].replace('_', 'T')
+    
     # Add year/day_of_year between the output_dir and the filename
     if date_directories:
         date_str = filename[18:26]
@@ -47,7 +48,7 @@ def get_output_path(output_directory, path, product_id, date_directories=True):
     else:
         save_dir = output_directory
 
-    save_path = os.path.join(save_dir, filename)
+    save_path = os.path.join(save_dir, filename_cci)
     return save_path
 
 
@@ -74,33 +75,50 @@ def format_l2(ds, input_path, attributes):
 
     # Make longitude and latitude name compliant with the format
     ds = ds.rename({'longitude': 'lon', 'latitude': 'lat'}) # might not be needed anymore if xsarslc is updated
+    pol = ds["pol"].item()
+    ds = ds.drop_vars("pol")
+    
+    ds.time.attrs = {
+        "standard_name": "time",
+        "authority": "CF-1.11, ACDD-1.3",
+        "axis": "T",
+        "long_name": "time of measurement",
+        "coverage_content_type": "coordinate"
+    }
     
     ds.lon.attrs = {
         "units": "degrees_east",
         "long_name": "longitude",
-        "standard_name": "longitude"
+        "standard_name": "longitude",
+        "comment": "geographical coordinates, WGS84 projection",
+        "authority": "CF-1.11, ACDD-1.3",
+        "axis": "X",
+        "valid_range": "-180 180",
+        "coverage_content_type": "coordinate"
     }    	
-    
+
     ds.lat.attrs = {
         "units": "degrees_north",
         "long_name": "latitude",
-        "standard_name": "latitude"
+        "standard_name": "latitude",
+        "comment": "geographical coordinates, WGS84 projection",
+        "authority": "CF-1.11, ACDD-1.3",
+        "axis": "Y",
+        "valid_range": "-90 90",
+        "coverage_content_type": "coordinate"
     }
-
-    ds.pol.attrs = {
-        "long_name": "polarization",
-    }
-
+    
     # Add global attributes to the dataset
     creation_date = datetime.today().strftime("%Y-%m-%dT%H:%M:%S:%f")
     
     global_attributes = {
-        "title": "ESA CCI Sea State L2P from ASAR onboard Envisat wave mode (WV).",
-        "id": "ESACCI-SEASTATE-L2P-ASAR-SWH-ENVISAT-v1",
+        "title": "ESA CCI Sea State L2P from ASAR wave mode (WV) onboard Envisat",
+        "id": "ESACCI-SEASTATE-L2P-ISSP-ENVISAT_ASAR_WV_IFR-v1",
         "summary": "This dataset contains estimates of significant wave height, windsea significant wave height and mean wave period data derived from Level 1 ASAR measurements.",
         "platform": "Envisat",
         "instrument": "ASAR",
         "band": "C",
+        "polarization": pol,
         "spatial_resolution": "5x10km",
         "creation_date": creation_date,
         "history": f"{creation_date} - Creation",
@@ -143,7 +161,7 @@ def format_l2(ds, input_path, attributes):
         "creator_email": "cersat@ifremer.fr",
         "creator_type": "institution",
         "creator_institution": "Ifremer",
-        "contributor_name": "Jean-Francois Piolle",
+        "contributor_name": "Fréderic Nouguier",
         "contributor_role": "principal investigator",
         "references": "?",
         "contact": "jfpiolle@ifremer.fr",
@@ -151,7 +169,7 @@ def format_l2(ds, input_path, attributes):
         "scientific_support_contact": "frederic.nouguier@ifremer.fr",
         "processing_software": "Ifremer ASAR Level-2 seastate processor",
         "product_version": "1.0",
-        "source": "CCI Sea State 1 L2P ASAR Processor ",
+        "source": "Ifremer CCI Sea State L2P ASAR Processor",
         "source_version": "1.0",
         "geospatial_bounds": "POLYGON ((-180.0 -80.0, 180.0 -80.0, 180.0 80.0, -180.0 80.0, -180.0 -80.0))",
         "geospatial_bounds_crs": "EPSG:4326",
@@ -263,7 +281,7 @@ def save_l2(asa_l2, output_path):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     
     # Set up encoding
-    encoding = {"time": {'units': 'Microseconds since 1990-01-01 00:00:00'}}
+    encoding = {"time": {'units': 'Microseconds since 1990-01-01 00:00:00', "_FillValue": 0}}
     encoding.update({v: {"_FillValue": 1e20} for v in asa_l2.variables if asa_l2[v].dtype == 'float32'})
     
     # Save to NetCDF

@@ -19,7 +19,7 @@ outputs:
 
 quality_variables:
   drop_confidence: True
-  swh_quality:
+  swh_quality_level:
       input: swh_confidence
       thresholds: [-0.75, -0.5]
       attributes:
@@ -29,7 +29,7 @@ quality_variables:
         band: C
         coordinates: lat lon
         standard_name: sea_surface_wave_significant_height status_flag
-  windwave_swh_quality:
+  windwave_swh_quality_level:
       input: windwave_swh_confidence
       thresholds: [-0.75, -0.5]
       attributes:
@@ -39,7 +39,7 @@ quality_variables:
         band: C
         coordinates: lat lon
         standard_name: wind_sea_surface_wave_significant_height status_flag
-  Tm0_quality:
+  Tm0_quality_level:
       input: Tm0_confidence
       thresholds: [-0.75, -0.5]
       attributes:
@@ -76,17 +76,26 @@ attributes:
     units: m
     standard_name: sea_surface_wave_significant_height
     long_name: significant wave height
-  
+    coordinates: lat lon
+    coverage_content_type: physicalMeasurement
+    ancillary_variables: swh_quality_level
+
   windwave_swh:
     units: m
     standard_name: wind_sea_surface_wave_significant_height
     long_name: significant wave height windsea
-  
+    coordinates: lat lon
+    coverage_content_type: physicalMeasurement
+    ancillary_variables: windwave_swh_quality_level
+
   Tm0:
-    units: sec
+    units: s
     standard_name: sea_surface_wave_mean_period
     long_name: mean wave period
-  
+    coordinates: lat lon
+    coverage_content_type: physicalMeasurement
+    ancillary_variables: Tm0_quality_level
+
   swh_confidence:
     units: m
     standard_name: sea_surface_wave_significant_height_confidence
@@ -98,6 +107,6 @@ attributes:
     long_name: confidence associated with significant wave height windsea
   
   Tm0_confidence:
-    units: sec
+    units: s
     standard_name: sea_surface_wave_mean_period
     long_name: mean wave period

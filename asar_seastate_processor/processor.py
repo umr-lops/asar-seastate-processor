@@ -49,7 +49,7 @@ def generate_l2_wave_product(
     })
 
     # Finish formatting l2 product
-    l2_product = xr.merge([ds[kept_variables], predictions])
+    l2_product = xr.merge([ds[kept_variables], predictions], compat='override')
 
     return l2_product
 
