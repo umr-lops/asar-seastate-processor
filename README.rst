@@ -9,9 +9,9 @@ Features
 --------
 
 This processor predicts estimates of:
-- significant wave height;
-- windsea significant wave height;
-- mean wave period.
+ - significant wave height;
+ - windsea significant wave height;
+ - mean wave period.
 from Level 1 ASAR measurements using empiral function leant on numerical hindcast (WAVEWATCH-III) and saves the results in a netCDF file.
 
 
