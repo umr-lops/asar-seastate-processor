@@ -23,7 +23,7 @@ quality_variables:
       input: swh_confidence
       thresholds: [-0.75, -0.5]
       attributes:
-        flag_values: 0b, 1b, 2b, 3b
+        flag_values: [0, 1, 2, 3]
         flag_meanings: undefined bad acceptable good
         coverage_content_type: qualityInformation
         band: C
@@ -33,7 +33,7 @@ quality_variables:
       input: windwave_swh_confidence
       thresholds: [-0.75, -0.5]
       attributes:
-        flag_values: 0b, 1b, 2b, 3b
+        flag_values: [0, 1, 2, 3]
         flag_meanings: undefined bad acceptable good
         coverage_content_type: qualityInformation
         band: C
@@ -43,7 +43,7 @@ quality_variables:
       input: Tm0_confidence
       thresholds: [-0.75, -0.5]
       attributes:
-        flag_values: 0b, 1b, 2b, 3b
+        flag_values: [0, 1, 2, 3]
         flag_meanings: undefined bad acceptable good
         coverage_content_type: qualityInformation
         band: C
