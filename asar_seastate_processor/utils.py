@@ -258,10 +258,11 @@ def add_quality_indices(ds, quality_variables):
         quality = np.select(
             [confidence < t1, (confidence >= t1) & (confidence < t2), confidence >= t2],
             [1, 2, 3], default=0
-        )
+        ).astype(np.int8)
         
         ds[var_name] = (confidence.dims, quality)
         ds[var_name].attrs = config['attributes']
+        ds[var_name].attrs['flag_values'] = np.array(ds[var_name].attrs['flag_values']).astype(ds[var_name].dtype)
 
         if drop:
             ds = ds.drop_vars(config['input'])
