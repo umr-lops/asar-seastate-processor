@@ -83,7 +83,7 @@ def main():
             )
             asa_l2 = apply_range_filters(asa_l1b, asa_l2, config.get('range_filters'))
             asa_l2 = format_l2(asa_l2, os.path.basename(path), config['attributes'])
-            asa_l2 = add_quality_indices(asa_l2, config.get('quality_variables'))
+            asa_l2 = add_quality_indices(asa_l2, config.get('quality_variables'), config.get('drop_confidence'))
             asa_l2 = asa_l2.reset_coords(["line", "sample"], drop=True)
             logging.info(f"Processing completed successfully for {path}")
             

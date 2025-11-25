@@ -238,19 +238,17 @@ def apply_range_filters(l1b, l2, range_filters):
     return l2.where(mask, np.nan)
 
 
-def add_quality_indices(ds, quality_variables):
+def add_quality_indices(ds, quality_variables, drop_confidence):
     """
     Add quality indices to dataset based on confidence thresholds.
     
     Args:
         ds (xarray.Dataset): Input dataset containing confidence variables to be processed.
         quality_variables (dict): Dictionary defining quality variable configurations. 
+        drop_confidence (boolean): Whether to drop or not the confidence variable given by the neural network.
     Returns
         (xarray.Dataset): Dataset with added quality variables.
     """
-
-    drop = quality_variables.pop('drop_confidence', None)
-    
     for var_name, config in quality_variables.items():
         confidence = ds[config['input']]
         t1, t2 = config['thresholds']
@@ -264,7 +262,7 @@ def add_quality_indices(ds, quality_variables):
         ds[var_name].attrs = config['attributes']
         ds[var_name].attrs['flag_values'] = np.array(ds[var_name].attrs['flag_values']).astype(ds[var_name].dtype)
 
-        if drop:
+        if drop_confidence:
             ds = ds.drop_vars(config['input'])
     
     return ds

@@ -17,8 +17,9 @@ outputs:
   - windwave_swh_confidence
   - Tm0_confidence
 
+drop_confidence: True
+
 quality_variables:
-  drop_confidence: True
   swh_quality_level:
       input: swh_confidence
       thresholds: [-0.75, -0.5]
