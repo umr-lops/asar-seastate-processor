@@ -98,16 +98,13 @@ attributes:
     ancillary_variables: Tm0_quality_level
 
   swh_confidence:
-    units: m
     standard_name: sea_surface_wave_significant_height_confidence
     long_name: confidence associated with significant wave height
   
   windwave_swh_confidence:
-    units: m
     standard_name: wind_sea_surface_wave_significant_height_confidence
     long_name: confidence associated with significant wave height windsea
   
   Tm0_confidence:
-    units: s
-    standard_name: sea_surface_wave_mean_period
-    long_name: mean wave period
+    standard_name: sea_surface_wave_mean_period_confidence
+    long_name: confidence associated with sea surface wave mean periode
